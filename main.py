@@ -15,6 +15,11 @@ pygame.display.set_caption("Rhythm Game Maybe")
 # Create Clock for fps
 clock = pygame.time.Clock()
 
+# Game font setting
+scoreFont = pygame.font.SysFont("arial", 80, True, False)
+messageFont = pygame.font.SysFont("arial", 45, True, False)
+
+
 # Loading image(block) and changing image's size
 block = [0,0,0,0,0]
 block_Rect = [0,0,0,0,0]
@@ -31,9 +36,16 @@ while i<4:
 
     i+=1
 
+##############################################################
+# Bug: icon loading failed
+icon = pygame.image.load("C:/Coding/Python/Pygame/icon.png")
+pygame.display.set_icon(icon)
 
 
 
+
+# Debugging: score message
+scoreMessage =  messageFont.render("", True, (255,255,255))
 
 
 
@@ -49,7 +61,7 @@ while playing:
         # Quit Event Process
         if event.type == pygame.QUIT:
             playing = False
-            print("\n\nScore: "+str(score))
+            print("\n\nScore: "+str(score)+"\n")
             pygame.quit()
 
         # Spacekey_Tab: for testing, but pretty good code
@@ -66,21 +78,26 @@ while playing:
                         block[k].set_alpha(0)
                         cnt+=1
 
-                # printing: terminal + scoring
+                # printing: terminal + scoring + setting score message
                 if cnt == 0:
                     print("MISS")
+                    scoreMessage =  messageFont.render("MISS -5", True, (232, 5, 65))
                     score-=5
                 elif cnt == 1:
                     print("1 block")
+                    scoreMessage =  messageFont.render("1 block +10", True, (91, 196, 4))
                     score+=10
                 elif cnt == 2:
                     print("2 blocks")
+                    scoreMessage =  messageFont.render("2 blocks +25", True, (4, 209, 206))
                     score+=25
                 elif cnt == 3:
                     print("3 blocks")
+                    scoreMessage =  messageFont.render("3 blocks +40", True, (158, 4, 209))
                     score+=40
                 elif cnt == 4:
                     print("4 blocks")
+                    scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
                     score+=100
 
 
@@ -89,14 +106,20 @@ while playing:
     SCREEN.fill((255,255,255))
     pygame.draw.line(SCREEN, (0,0,0), [0,600], [600,600], width=3)
     pygame.draw.line(SCREEN, (0,0,0), [0,650], [600,650], width=3)
-    myFont = pygame.font.SysFont("arial", 80, True, False)
+
 
     # Scoreboard
-    scoreText = myFont.render(str(score), True, (0,0,0))
+    scoreText = scoreFont.render(str(score), True, (0,0,0))
     score_Rect = scoreText.get_rect()
     score_Rect.centerx = 300
     score_Rect.y = 100
     SCREEN.blit(scoreText, score_Rect)
+
+    # Score message
+    scoreM_Rect = scoreMessage.get_rect()
+    scoreM_Rect.centerx = 300
+    scoreM_Rect.y = 200
+    SCREEN.blit(scoreMessage, scoreM_Rect)
 
 
     ##############################
