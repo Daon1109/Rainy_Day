@@ -2,6 +2,7 @@
 # 2022 School Project: Rhythm Game
 
 import pygame
+import random
 import key
 
 # Restart pygame(init)
@@ -18,6 +19,10 @@ clock = pygame.time.Clock()
 # Game font setting
 scoreFont = pygame.font.SysFont("arial", 80, True, False)
 messageFont = pygame.font.SysFont("arial", 45, True, False)
+blockFont = pygame.font.SysFont("arial", 25, True, False)
+
+# default messages
+scoreMessage =  messageFont.render("", True, (255,255,255))
 
 
 # Loading image(block) and changing image's size
@@ -36,24 +41,39 @@ while i<4:
 
     i+=1
 
+# Setting block speed
+speed = [0,0,0,0,0]
+savedspeed = [0,0,0,0,0]
+for sspd in range(4):
+    speed[sspd] = random.randint(3,10)
+    savedspeed[sspd] = speed[sspd]
+
 ##############################################################
 # Bug: icon loading failed
 icon = pygame.image.load("C:/Coding/Python/Pygame/icon.png")
 pygame.display.set_icon(icon)
+##############################################################
 
 
 
 
-# Debugging: score message
-scoreMessage =  messageFont.render("", True, (255,255,255))
+
 
 
 
 # Playing Code
 playing = True
 score = 0
+block_cnt = 4
 
 while playing:
+
+    # Background Settings
+    SCREEN.fill((255,255,255))
+    pygame.draw.line(SCREEN, (0,0,0), [0,600], [600,600], width=3)
+    pygame.draw.line(SCREEN, (0,0,0), [0,650], [600,650], width=3)
+
+
 
     # Event Process
     for event in pygame.event.get():
@@ -64,13 +84,17 @@ while playing:
             print("\n\nScore: "+str(score)+"\n")
             pygame.quit()
 
-        # Spacekey_Tab: for testing, but pretty good code
+        # Multiple key input
+        pressed_keys = pygame.key.get_pressed()
+
+
+        # Spacekey_Tab: for testing
         if event.type == pygame.KEYDOWN:
             if event.key == key.space:
                 cnt = 0
 
                 
-                # 판정 코드
+                # judging if block is in range
                 for k in range(4):
                     if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
 
@@ -99,17 +123,34 @@ while playing:
                     print("4 blocks")
                     scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
                     score+=100
+            
 
-
-
-    # Background Settings
-    SCREEN.fill((255,255,255))
-    pygame.draw.line(SCREEN, (0,0,0), [0,600], [600,600], width=3)
-    pygame.draw.line(SCREEN, (0,0,0), [0,650], [600,650], width=3)
-
+        #############################################
+        # 에러 덩어리
+        # Dev: easteregg
+        if pressed_keys[key.d] and pressed_keys[key.e] and pressed_keys[key.v]:
+            SCREEN.fill((0,0,0))
+            dev_esteg = scoreFont.render("Dev: Suho Ban\nGithub: Daon1109\nPosung Highschool Project\n\nThanks for playing!",True,(255,255,255))
+            estegText_Rect = dev_esteg.get_rect()
+            SCREEN.blit(dev_esteg, estegText_Rect)
+            scoreMessage.set_alpha(0)
+            scoreText.set_alpha(0)
+            blockcntText.set_alpha(0)
+            SPBText.set_alpha(0)
+            for rset in range(4):
+                speed[rset]=0
+                block[rset].set_alpha(0)
+        else:
+            #SCREEN.fill((255,255,255))
+            scoreText = scoreFont.render(str(score), True, (0,0,0))
+            blockcntText = blockFont.render(("Block: "+str(block_cnt)), True, (0,0,0))
+            spb = score / block_cnt
+            SPBText = blockFont.render(("SPB: "+str(spb)), True, (0,0,0))
+            for rturn in range(4):
+                speed[rturn] = savedspeed[rturn]
+            
 
     # Scoreboard
-    scoreText = scoreFont.render(str(score), True, (0,0,0))
     score_Rect = scoreText.get_rect()
     score_Rect.centerx = 300
     score_Rect.y = 100
@@ -121,15 +162,22 @@ while playing:
     scoreM_Rect.y = 200
     SCREEN.blit(scoreMessage, scoreM_Rect)
 
+    # score per block
+    blockcnt_Rect = blockcntText.get_rect()
+    SPB_Rect = SPBText.get_rect()
+    SCREEN.blit(blockcntText, [450, 150])
+    SCREEN.blit(SPBText, [450, 200])
 
-    ##############################
+
+
+
+    #############################################
     # 좌표증가 코드
-    block_Rect[0].y +=3
-    block_Rect[1].y +=5
-    block_Rect[2].y +=7
-    block_Rect[3].y +=10
-    ##############################
-
+    block_Rect[0].y +=speed[0]
+    block_Rect[1].y +=speed[1]
+    block_Rect[2].y +=speed[2]
+    block_Rect[3].y +=speed[3]
+    #############################################
 
 
 
@@ -141,6 +189,17 @@ while playing:
             block_Rect[j].bottom = 0
             # making image appear
             block[j].set_alpha(255)
+            # count block
+            block_cnt+=1
+            # 지속적인 업데이트가 안됨. 왜지?
+
+
+            ####################################################
+            # changing speed(random)
+            speed[j] = random.randint(3,10)
+            savedspeed[j] = speed[j]
+            ####################################################
+
 
 
         # Copy block in surface (coordinate: block_Rect)
