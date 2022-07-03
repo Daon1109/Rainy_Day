@@ -11,10 +11,11 @@ def keyinput(SCREEN, clock):
 
     # fonts
     c_font = pygame.font.SysFont("arial", 45, True, False)
+    sb_font = pygame.font.SysFont("arial", 30, True, False)
     # color
     white = (255,255,255)
     black = (0,0,0)
-    blue = (9,47,184)
+    blue = (21,129,230)
     darkgreen = (8,102,43)
     lightgreen = (8,207,82)
     color = [0,0,0,0,0]
@@ -99,13 +100,16 @@ def keyinput(SCREEN, clock):
                     # Check for Backspace
                     if event.key == pygame.K_BACKSPACE:
                         # get text input from 0 to -1 i.e. end.
-                        customkey[eventbox] = customkey[eventbox][:-1]
+                        customkey[eventbox] = customkey[eventbox][8:-1]
         
                     # Unicode standard(string)
                     else:
                         customkey[eventbox] += event.unicode
                         if len(customkey[eventbox]) >= 0:
-                            customkey[eventbox] = customkey[eventbox][0].upper()
+                            if customkey[eventbox] == " ":
+                                customkey[eventbox] = "spacebar"
+                            else:
+                                customkey[eventbox] = customkey[eventbox][0].upper()
 
 
         # UI 1234
@@ -122,7 +126,12 @@ def keyinput(SCREEN, clock):
             color[eventbox] = blue
 
             # UI 1234
-            keydisplayed[i] = c_font.render(customkey[i], True, color[i])
+            if customkey[i] == "spacebar":
+                keydisplayed[i] = sb_font.render(customkey[i], True, color[i])
+                kd_rect[i].centerx = 30 + (150 * i)
+            else:
+                keydisplayed[i] = c_font.render(customkey[i], True, color[i])
+                kd_rect[i].centerx = 75 + (150 * i)
             SCREEN.blit(keydisplayed[i], kd_rect[i])
 
             # UI keyinputbox
