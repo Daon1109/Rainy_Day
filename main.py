@@ -1,8 +1,10 @@
 
 # 2022 School Project: Rhythm Game
+# easteregg 부분 잘라낼것
 
 import pygame
 import random
+impoet customkeyinput
 import key
 
 # Restart pygame(init)
@@ -11,10 +13,22 @@ pygame.init()
  
 # Save SCREEN object
 SCREEN = pygame.display.set_mode((600,800))
-pygame.display.set_caption("Rhythm Game Maybe")
 
 # Create Clock for fps
 clock = pygame.time.Clock()
+
+#############################################################
+# Custom key input
+customkey = customkeyinput.keyinput(SCREEN,clock)
+print(customkey)
+#############################################################
+
+
+
+pygame.display.set_caption("Rhythm Game Maybe")
+# Game font setting
+scoreFont = pygame.font.SysFont("arial", 80, True, False)
+messageFont = pygame.font.SysFont("arial", 45, True, False)
 
 # Game font setting
 scoreFont = pygame.font.SysFont("arial", 80, True, False)
