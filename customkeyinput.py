@@ -108,6 +108,9 @@ def keyinput(SCREEN, clock):
                         if len(customkey[eventbox]) >= 0:
                             if customkey[eventbox] == " ":
                                 customkey[eventbox] = "spacebar"
+                            # TAB key
+                            elif customkey[eventbox] == chr(9):
+                                customkey[eventbox] = "TAB"
                             else:
                                 customkey[eventbox] = customkey[eventbox][0].upper()
 
@@ -129,6 +132,9 @@ def keyinput(SCREEN, clock):
             if customkey[i] == "spacebar":
                 keydisplayed[i] = sb_font.render(customkey[i], True, color[i])
                 kd_rect[i].centerx = 30 + (150 * i)
+            elif customkey[i] == "TAB":
+                keydisplayed[i] = c_font.render(customkey[i], True, color[i])
+                kd_rect[i].centerx = 50 + (150 * i)
             else:
                 keydisplayed[i] = c_font.render(customkey[i], True, color[i])
                 kd_rect[i].centerx = 75 + (150 * i)
