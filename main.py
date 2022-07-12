@@ -89,8 +89,14 @@ scoreText = scoreFont.render(str(score), True, (0,0,0))
 
 # Playing Code
 playing = True
+cnt = 0         # blocks per keydown(score) counter
+cast_t = 0      # consider specific range of time as the same moment
+combo = 0       # 'combo' score
+yco_hit = [0,0,0,0,0]
+combo_identifier = [0,0,0,0,0]
 
 while playing:
+
 
     # Event Process
     for event in pygame.event.get():
@@ -105,18 +111,38 @@ while playing:
 
 
 
-
+        
         # Applying Customized Keys
         if event.type == pygame.KEYDOWN:
-            # Score counter (미완성)
-            cnt=0
+            
+            #cnt=0
+
+            # 다른 키 눌러도 점수 올라가는 에러 존재
+
+            # something's wrong with variable cnt (**error occured while playing with spacebar)
             for k in range(4):
                 if event.key == customkey[k]:
                     if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
                         # making image transparent
                         block[k].set_alpha(0)
 
-                        cnt+=1
+                        # combo system #1
+                        combo_identifier[k] = 1
+                        yco_hit[k] = block_Rect[k].y
+
+                        # cast_t counting
+                        print("cast_t: "+str(cast_t))
+                        if cast_t > 18:      # range: 0.4 sec (I didnt check it)
+                            cnt = 1
+                            cast_t = 0
+                        else:
+                            cnt += 1
+
+                    # "MISS"
+                    else:
+                        cnt = 0
+
+
             # printing: terminal + scoring + setting score message
             if cnt == 0:
                 print("MISS")
@@ -126,6 +152,20 @@ while playing:
                 print("1 block")
                 scoreMessage =  messageFont.render("1 block +10", True, (91, 196, 4))
                 score+=10
+            elif cnt == 2:
+                print("2 blocks")
+                scoreMessage =  messageFont.render("2 blocks +25", True, (4, 209, 206))
+                score+=15
+            elif cnt == 3:
+                print("3 blocks")
+                scoreMessage =  messageFont.render("3 blocks +40", True, (158, 4, 209))
+                score+=15
+            elif cnt == 4:
+                print("4 blocks")
+                scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
+                score+=60
+
+            print("combo: "+str(combo))
 
 
 
@@ -172,10 +212,20 @@ while playing:
     while j<4:
         # Preventing block escaping screen
         if block_Rect[j].y > 1000:
+
             # y coordinate of block(reset)
             block_Rect[j].bottom = 0
             # making image appear
             block[j].set_alpha(255)
+
+        elif block_Rect[j].y == yco_hit[j]:
+
+            # combo system #2
+            if combo_identifier[j] == 1:
+                combo += 1
+            else:
+                combo = 0
+            combo_identifier[j] = 0
 
 
         # Copy block in surface (coordinate: block_Rect)
@@ -190,3 +240,6 @@ while playing:
 
     # fps = 60
     clock.tick(60)
+
+    # counting cast_t
+    cast_t += 1
