@@ -16,6 +16,7 @@ def keyinput(SCREEN, clock):
     white = (255,255,255)
     black = (0,0,0)
     blue = (21,129,230)
+    red = (227,46,14)
     darkgreen = (8,102,43)
     lightgreen = (8,207,82)
     color = [0,0,0,0,0]
@@ -59,6 +60,8 @@ def keyinput(SCREEN, clock):
     # Display custom-key-input-window
     active = False
     eventbox = 4
+    keyoverlap = 0
+    errcnt = 0
     c_playing = True
     while c_playing:
 
@@ -91,7 +94,20 @@ def keyinput(SCREEN, clock):
 
                 # Enter Key Process
                 if pygame.Rect(50, 450, 500, 60).collidepoint(event.pos):
-                    c_playing = False
+                    keyoverlap = 0      # identify whether key overlapped or not
+                    for prvnt1 in range(4):
+                        for prvnt2 in range(4):
+                            if prvnt1 != prvnt2:
+                                # ErrorMessage: key overlap
+                                if customkey[prvnt1] == customkey[prvnt2]:
+                                    keyoverlap = 1
+                    # Error Message
+                    if keyoverlap == 1:
+                        print("ERROR: key overlapped")
+                        errcnt = 0
+                    # successful input -> playing start
+                    else:
+                        c_playing = False
 
             if active:
                 # Text input
@@ -161,12 +177,30 @@ def keyinput(SCREEN, clock):
         enter_rect.centery = 480
         SCREEN.blit(enterkey, enter_rect)
 
+        # Error Message: keyoverlapped
+        if errcnt > 180:
+            keyoverlap = 0
+        errorMessage = c_font.render("ERROR: Key Overlapped", True, white)
+        em_rect = errorMessage.get_rect()
+        em_rect.centerx = 300
+        em_rect.centery = 250
+        if keyoverlap == 0:
+            em_rect_pos = pygame.Rect(0,0,0,0)
+            errorMessage.set_alpha(0)
+        else:
+            em_rect_pos = pygame.Rect(50, 200, 500, 100)
+            errorMessage.set_alpha(255)
+        pygame.draw.rect(SCREEN, red, em_rect_pos, border_radius=6)
+        SCREEN.blit(errorMessage, em_rect)
+
 
 
         # Update Screen
         pygame.display.flip()
         # fps = 60
         clock.tick(60)
+        # error message countdown
+        errcnt +=1
 
     
     # Returning key input
