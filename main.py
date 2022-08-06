@@ -14,7 +14,7 @@ pygame.init()
 SCREEN = pygame.display.set_mode((600,800))
 ##############################################################
 # Bug: icon loading failed
-icon = pygame.image.load("C:/Coding/Python/Pygame/icon.png")
+icon = pygame.image.load("C:/Coding/Python/RhythmGameMaybe/icon.png")
 pygame.display.set_icon(icon)
 ##############################################################
 
@@ -66,7 +66,7 @@ block_Rect = [0,0,0,0,0]
 i=0
 while i<4:
     # Loading image(block)
-    block[i] = pygame.image.load("C:/Coding/Python/Pygame/block.png")
+    block[i] = pygame.image.load("C:/Coding/Python/RhythmGameMaybe/block.png")
     block[i] = pygame.transform.scale(block[i], (150, 30))
 
     # Save block's Rect data
@@ -92,7 +92,6 @@ playing = True
 cnt = 0         # blocks per keydown(score) counter
 cast_t = 0      # consider specific range of time as the same moment
 combo = 0       # 'combo' score
-yco_hit = [0,0,0,0,0]
 combo_identifier = [0,0,0,0,0]
 
 while playing:
@@ -115,32 +114,41 @@ while playing:
         # Applying Customized Keys
         if event.type == pygame.KEYDOWN:
             
-            #cnt=0
-
-            # 다른 키 눌러도 점수 올라가는 에러 존재
-
             # something's wrong with variable cnt (**error occured while playing with spacebar)
-            for k in range(4):
-                if event.key == customkey[k]:
-                    if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
-                        # making image transparent
-                        block[k].set_alpha(0)
+            if event.key in customkey:
+                for k in range(4):
+                    if event.key == customkey[k]:
+                        if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
+                            # making image transparent
+                            block[k].set_alpha(0)
 
-                        # combo system #1
-                        combo_identifier[k] = 1
-                        yco_hit[k] = block_Rect[k].y
+                            # combo system #1
+                            combo_identifier[k] = 1
+                            combo +=1
 
-                        # cast_t counting
-                        print("cast_t: "+str(cast_t))
-                        if cast_t > 18:      # range: 0.4 sec (I didnt check it)
-                            cnt = 1
-                            cast_t = 0
+                            # cast_t counting
+                            # print("cast_t: "+str(cast_t))
+                            if cast_t > 18:      # range: 0.4 sec (I didnt check it)
+                                cnt = 1
+                                cast_t = 0
+                            else:
+                                cnt += 1
+
+                        # MISS: range out
                         else:
-                            cnt += 1
+                            cnt = 0
+                            # combo system #2
+                            print("combo reset")
+                            combo = 0
+                            combo_identifier = [0,0,0,0,0]
 
-                    # "MISS"
-                    else:
-                        cnt = 0
+            # MISS: wrong key
+            else:
+                cnt = 0
+                # combo system #2
+                print("combo reset")
+                combo = 0
+                combo_identifier = [0,0,0,0,0]
 
 
             # printing: terminal + scoring + setting score message
@@ -165,7 +173,7 @@ while playing:
                 scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
                 score+=60
 
-            print("combo: "+str(combo))
+            print("combo: "+str(combo)+"\n")
 
 
 
@@ -196,6 +204,17 @@ while playing:
     scoreM_Rect.y = 200
     SCREEN.blit(scoreMessage, scoreM_Rect)
 
+    # Combo Message
+    comboMessage = messageFont.render("Combo: "+str(combo), True, (0,0,0))
+    combo_rect = comboMessage.get_rect()
+    combo_rect.centerx = 300
+    combo_rect.y = 250
+    if combo > 1:
+        comboMessage.set_alpha(255)
+    else:
+        comboMessage.set_alpha(0)
+    SCREEN.blit(comboMessage, combo_rect)
+
 
     ##############################
     # 좌표증가 코드
@@ -218,14 +237,13 @@ while playing:
             # making image appear
             block[j].set_alpha(255)
 
-        elif block_Rect[j].y == yco_hit[j]:
 
-            # combo system #2
-            if combo_identifier[j] == 1:
-                combo += 1
-            else:
-                combo = 0
-            combo_identifier[j] = 0
+        # combo system #3
+        if block_Rect[j].y >660:
+            if combo_identifier[j] == 0:
+                print("combo reset")
+                combo = -1
+                combo_identifier = [0,0,0,0,0]
 
 
         # Copy block in surface (coordinate: block_Rect)
