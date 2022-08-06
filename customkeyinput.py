@@ -60,7 +60,8 @@ def keyinput(SCREEN, clock):
     # Display custom-key-input-window
     active = False
     eventbox = 4
-    keyoverlap = 0
+    e_keyoverlap = 0
+    e_noinput = 0
     errcnt = 0
     c_playing = True
     while c_playing:
@@ -83,7 +84,7 @@ def keyinput(SCREEN, clock):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for c in range(4):
                     # click input_rect[c]:
-                    if input_rect[c].collidepoint(event.pos):
+                    if input_rect[c].collidepoint(event.pos) or message_rect[c].collidepoint(event.pos):
                         active = True
                         eventbox = c
                         break
@@ -94,16 +95,24 @@ def keyinput(SCREEN, clock):
 
                 # Enter Key Process
                 if pygame.Rect(50, 450, 500, 60).collidepoint(event.pos):
-                    keyoverlap = 0      # identify whether key overlapped or not
+                    e_keyoverlap = 0      # identify whether key overlapped or not
+                    e_noinput = 0         # identify if customkey has no value
                     for prvnt1 in range(4):
                         for prvnt2 in range(4):
                             if prvnt1 != prvnt2:
                                 # ErrorMessage: key overlap
                                 if customkey[prvnt1] == customkey[prvnt2]:
-                                    keyoverlap = 1
+                                    e_keyoverlap = 1
+                        # ErrorMessage: no input
+                        if len(customkey[prvnt1]) == 0:
+                            e_noinput = 1
+
                     # Error Message
-                    if keyoverlap == 1:
+                    if e_keyoverlap == 1:
                         print("ERROR: key overlapped")
+                        errcnt = 0
+                    if e_noinput == 1:
+                        print("ERROR: NO Input")
                         errcnt = 0
                     # successful input -> playing start
                     else:
@@ -121,7 +130,8 @@ def keyinput(SCREEN, clock):
                     # Unicode standard(string)
                     else:
                         customkey[eventbox] += event.unicode
-                        if len(customkey[eventbox]) >= 0:
+                        if len(customkey[eventbox]) > 0:
+
                             if customkey[eventbox] == " ":
                                 customkey[eventbox] = "spacebar"
                             # TAB key
@@ -177,14 +187,22 @@ def keyinput(SCREEN, clock):
         enter_rect.centery = 480
         SCREEN.blit(enterkey, enter_rect)
 
-        # Error Message: keyoverlapped
+        # Error Message
         if errcnt > 180:
-            keyoverlap = 0
-        errorMessage = c_font.render("ERROR: Key Overlapped", True, white)
+            e_keyoverlap = 0
+            e_noinput = 0
+        # errormessage setting
+        if e_noinput == 1:
+            errorMessage = c_font.render("ERROR: No Input", True, white)
+        elif e_noinput == 1:
+            errorMessage = c_font.render("ERROR: Key Overlapped", True, white)
+        else:   # Debugging
+            errorMessage = c_font.render("NONE", True, white)
         em_rect = errorMessage.get_rect()
         em_rect.centerx = 300
         em_rect.centery = 250
-        if keyoverlap == 0:
+        # making errormessage transparent
+        if (e_keyoverlap + e_noinput) == 0:
             em_rect_pos = pygame.Rect(0,0,0,0)
             errorMessage.set_alpha(0)
         else:
