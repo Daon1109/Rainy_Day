@@ -25,7 +25,7 @@ clock = pygame.time.Clock()
 # Game font setting
 scoreFont = pygame.font.SysFont("arial", 80, True, False)
 messageFont = pygame.font.SysFont("arial", 45, True, False)
-sb_font = pygame.font.SysFont("arial", 30, True, False)
+sb_font = pygame.font.SysFont("arial", 40, True, False)
 
 
 #############################################################################################
@@ -40,9 +40,9 @@ for c in range(4):
     keydisplayed[c] = messageFont.render(customkey[c], True, (0,0,0))
     kd_rect[c] = keydisplayed[c].get_rect()
     kd_rect[c].centery = 625
-    if customkey[c] == "spacebar":
+    if len(customkey[c]) == 5:
         keydisplayed[c] = sb_font.render(customkey[c], True, (0,0,0))
-        kd_rect[c].centerx = 100 + (150 * c)    # idk why
+        kd_rect[c].centerx = 80 + (150 * c)    # idk why
     else:
         keydisplayed[c] = messageFont.render(customkey[c], True, (0,0,0))
         kd_rect[c].centerx = 75 + (150 * c)
