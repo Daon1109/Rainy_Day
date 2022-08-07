@@ -11,7 +11,7 @@ def keyinput(SCREEN, clock):
 
     # fonts
     c_font = pygame.font.SysFont("arial", 45, True, False)
-    sb_font = pygame.font.SysFont("arial", 30, True, False)
+    sb_font = pygame.font.SysFont("arial", 40, True, False)
     # color
     white = (255,255,255)
     black = (0,0,0)
@@ -108,11 +108,11 @@ def keyinput(SCREEN, clock):
                             e_noinput = 1
 
                     # Error Message
-                    if e_keyoverlap == 1:
-                        print("ERROR: key overlapped")
-                        errcnt = 0
                     if e_noinput == 1:
                         print("ERROR: NO Input")
+                        errcnt = 0
+                    elif e_keyoverlap == 1:
+                        print("ERROR: key overlapped")
                         errcnt = 0
                     # successful input -> playing start
                     else:
@@ -132,11 +132,17 @@ def keyinput(SCREEN, clock):
                         customkey[eventbox] += event.unicode
                         if len(customkey[eventbox]) > 0:
 
+                            # special keys
                             if customkey[eventbox] == " ":
-                                customkey[eventbox] = "spacebar"
-                            # TAB key
+                                customkey[eventbox] = "SPACE"
                             elif customkey[eventbox] == chr(9):
                                 customkey[eventbox] = "TAB"
+                            elif customkey[eventbox] == chr(27):
+                                customkey[eventbox] = "ESC"
+                            elif customkey[eventbox] == chr(127):
+                                customkey[eventbox] = "DEL"
+                            elif customkey[eventbox] == chr(13):
+                                customkey[eventbox] = "ENTER"
                             else:
                                 customkey[eventbox] = customkey[eventbox][0].upper()
 
@@ -155,10 +161,10 @@ def keyinput(SCREEN, clock):
             color[eventbox] = blue
 
             # UI 1234
-            if customkey[i] == "spacebar":
+            if len(customkey[i]) == 5:
                 keydisplayed[i] = sb_font.render(customkey[i], True, color[i])
-                kd_rect[i].centerx = 30 + (150 * i)
-            elif customkey[i] == "TAB":
+                kd_rect[i].centerx = 35 + (150 * i)
+            elif len(customkey[i]) == 3:
                 keydisplayed[i] = c_font.render(customkey[i], True, color[i])
                 kd_rect[i].centerx = 50 + (150 * i)
             else:
@@ -194,7 +200,7 @@ def keyinput(SCREEN, clock):
         # errormessage setting
         if e_noinput == 1:
             errorMessage = c_font.render("ERROR: No Input", True, white)
-        elif e_noinput == 1:
+        elif e_keyoverlap == 1:
             errorMessage = c_font.render("ERROR: Key Overlapped", True, white)
         else:   # Debugging
             errorMessage = c_font.render("NONE", True, white)
