@@ -82,11 +82,38 @@ def keyfunc(keychar):
         key = pygame.K_8
     elif keychar == "9":
         key = pygame.K_9
-    elif keychar == "spacebar":
+    elif keychar == "SPACE":
         key = pygame.K_SPACE
     elif keychar == "TAB":
         key = pygame.K_TAB
-
+    elif keychar == "-":
+        key = pygame.K_MINUS
+    elif keychar == "=":
+        key = pygame.K_EQUALS
+    elif keychar == ";":
+        key = pygame.K_SEMICOLON
+    elif keychar == ",":
+        key = pygame.K_COMMA
+    elif keychar == "/":
+        key = pygame.K_SLASH
+    elif keychar == "\\":
+        key = pygame.K_BACKSLASH
+    elif keychar == ".":
+        key = pygame.K_PERIOD
+    elif keychar == "`":
+        key = pygame.K_BACKQUOTE
+    elif keychar == "\'":
+        key = pygame.K_QUOTE
+    elif keychar == "[":
+        key = pygame.K_LEFTBRACKET
+    elif keychar == "]":
+        key = pygame.K_RIGHTBRACKET
+    elif keychar == "ESC":
+        key = pygame.K_ESCAPE
+    elif keychar == "DEL":
+        key = pygame.K_DELETE
+    elif keychar == "ENTER":
+        key = pygame.K_RETURN
 
 
     return key
