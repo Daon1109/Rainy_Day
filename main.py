@@ -4,17 +4,20 @@
 
 import pygame
 import key
+import design as d
+import home
 import customkeyinput
+
 
 # Restart pygame(init)
 pygame.init()
 
  
 # Save SCREEN object
-SCREEN = pygame.display.set_mode((600,800))
+SCREEN = pygame.display.set_mode((1422,800))
 ##############################################################
 # Bug: icon loading failed
-icon = pygame.image.load("C:/Coding/Python/RhythmGameMaybe/icon.png")
+icon = pygame.image.load("C:/Coding/Python/Rainy_Day/icon.png")
 pygame.display.set_icon(icon)
 ##############################################################
 
@@ -23,9 +26,17 @@ pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 
 # Game font setting
-scoreFont = pygame.font.SysFont("arial", 80, True, False)
-messageFont = pygame.font.SysFont("arial", 45, True, False)
-sb_font = pygame.font.SysFont("arial", 40, True, False)
+scoreFont = d.arial(80)
+messageFont = d.arial(45)
+sb_font = d.arial(40)
+
+
+#############################################################################################
+# START & level choosing (game home)
+home.start_display(SCREEN, clock)
+#home.levelchoose(SCREEN, clock)
+#############################################################################################
+
 
 
 #############################################################################################
@@ -37,15 +48,15 @@ keydisplayed = [0,0,0,0,0]
 kd_rect = [0,0,0,0,0]
 for c in range(4):
     # UI 1234 (Copied)
-    keydisplayed[c] = messageFont.render(customkey[c], True, (0,0,0))
+    keydisplayed[c] = messageFont.render(customkey[c], True, d.black)
     kd_rect[c] = keydisplayed[c].get_rect()
     kd_rect[c].centery = 625
     if len(customkey[c]) == 5:
-        keydisplayed[c] = sb_font.render(customkey[c], True, (0,0,0))
-        kd_rect[c].centerx = 80 + (150 * c)    # idk why
+        keydisplayed[c] = sb_font.render(customkey[c], True, d.black)
+        kd_rect[c].centerx = 491 + (150 * c)    # idk why
     else:
-        keydisplayed[c] = messageFont.render(customkey[c], True, (0,0,0))
-        kd_rect[c].centerx = 75 + (150 * c)
+        keydisplayed[c] = messageFont.render(customkey[c], True, d.black)
+        kd_rect[c].centerx = 486 + (150 * c)
 
     # string replaced with pygame.key (*reusing variable)
     customkey[c] = key.keyfunc(customkey[c])
@@ -57,7 +68,7 @@ for c in range(4):
 
 
 # Title
-pygame.display.set_caption("Rhythm Game Maybe")
+pygame.display.set_caption("Rainy Day")
 
 
 # Loading image(block) and changing image's size
@@ -66,12 +77,12 @@ block_Rect = [0,0,0,0,0]
 i=0
 while i<4:
     # Loading image(block)
-    block[i] = pygame.image.load("C:/Coding/Python/RhythmGameMaybe/block.png")
+    block[i] = pygame.image.load("C:/Coding/Python/Rainy_Day/block.png")
     block[i] = pygame.transform.scale(block[i], (150, 30))
 
     # Save block's Rect data
     block_Rect[i] = block[i].get_rect()
-    block_Rect[i].x = 150*i
+    block_Rect[i].x = 411+ 150*i
     block_Rect[i].y = 100
 
     i+=1
@@ -81,9 +92,10 @@ while i<4:
 
 
 # Debugging: score message
-scoreMessage =  messageFont.render("", True, (255,255,255))
+scoreMessage =  messageFont.render("", True, d.white)
 score = 0
-scoreText = scoreFont.render(str(score), True, (0,0,0))
+boost = 0
+scoreText = scoreFont.render(str(score), True, d.black)
 
 
 
@@ -114,7 +126,6 @@ while playing:
         # Applying Customized Keys
         if event.type == pygame.KEYDOWN:
             
-            # something's wrong with variable cnt (**error occured while playing with spacebar)
             if event.key in customkey:
                 for k in range(4):
                     if event.key == customkey[k]:
@@ -141,6 +152,20 @@ while playing:
                             print("combo reset")
                             combo = 0
                             combo_identifier = [0,0,0,0,0]
+                    
+            elif event.key == key.space:
+                ##########################################################################################
+                if boost<1000:  # Wrong Key
+                    cnt = 0     # combo system #2
+                    print("combo reset")
+                    combo = 0
+                    combo_identifier = [0,0,0,0,0]
+                else:
+                    # boost reset
+                    boost = 0
+                    combo = 0
+                    combo_identifier = [0,0,0,0,0]
+
 
             # MISS: wrong key
             else:
@@ -160,20 +185,27 @@ while playing:
                 print("1 block")
                 scoreMessage =  messageFont.render("1 block +10", True, (91, 196, 4))
                 score+=10
+                if boost<1000: boost+=10
             elif cnt == 2:
                 print("2 blocks")
                 scoreMessage =  messageFont.render("2 blocks +25", True, (4, 209, 206))
                 score+=15
+                if boost<1000: boost+=15
             elif cnt == 3:
                 print("3 blocks")
                 scoreMessage =  messageFont.render("3 blocks +40", True, (158, 4, 209))
                 score+=15
+                if boost<1000: boost+=15
             elif cnt == 4:
                 print("4 blocks")
                 scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
                 score+=60
+                if boost<1000: boost+=60
 
             print("combo: "+str(combo)+"\n")
+            if boost<1000:
+                if combo>1:
+                    boost = boost + (combo*2-5)
 
 
 
@@ -184,30 +216,61 @@ while playing:
     # Background Settings
     # Warning: background color setting code can erase previous display settings
     SCREEN.fill((255,255,255))
-    pygame.draw.line(SCREEN, (0,0,0), [150,600], [150,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [300,600], [300,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [450,600], [450,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [0,600], [600,600], width=3)
-    pygame.draw.line(SCREEN, (0,0,0), [0,650], [600,650], width=3)
+    pygame.draw.line(SCREEN, (0,0,0), [411+150,600], [411+150,650], 3)
+    pygame.draw.line(SCREEN, (0,0,0), [411+300,600], [411+300,650], 3)
+    pygame.draw.line(SCREEN, (0,0,0), [411+450,600], [411+450,650], 3)
+    pygame.draw.line(SCREEN, (0,0,0), [411,600], [1011,600], width=3)
+    pygame.draw.line(SCREEN, (0,0,0), [411,650], [1011,650], width=3)
+    pygame.draw.line(SCREEN, (0,0,0), [410,0], [410,800], width=3)
+    pygame.draw.line(SCREEN, (0,0,0), [1012,0], [1012,800], width=3)
+
+
+
+    # Boost
+    boost_length = boost/2
+    boost_yco = 600 - boost_length
+    if boost_length < 500:
+        booststr = "Boost"
+        boost_color = d.darkblue
+        boost_r_color = d.white
+    else:
+        boost = 1000
+        booststr = "Spacebar!"
+        boost_color = d.orangeyellow
+        boost_r_color = d.white
+
+    pygame.draw.rect(SCREEN, d.darkblue, pygame.Rect(1146,100,150,500), border_radius=3)
+    pygame.draw.rect(SCREEN, d.orangeyellow, pygame.Rect(1146,boost_yco,150,boost_length), border_radius=3)
+    pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,620,200,50), border_radius=5)
+    boostText = messageFont.render(booststr, True, boost_r_color)     # "Boost"
+    boost_Rect = boostText.get_rect()
+    boost_Rect.centerx = 1221
+    boost_Rect.y = 620
+    SCREEN.blit(boostText, boost_Rect)
+    boostrate = messageFont.render(str(boost/10)+"%", True, d.white)     # Boost Rate
+    boostrate_Rect = boostrate.get_rect()
+    boostrate_Rect.centerx = 1221
+    boostrate_Rect.y = 150
+    SCREEN.blit(boostrate, boostrate_Rect)
 
 
     # Scoreboard
-    scoreText = scoreFont.render(str(score), True, (0,0,0))
+    scoreText = scoreFont.render(str(score), True, d.black)
     score_Rect = scoreText.get_rect()
-    score_Rect.centerx = 300
+    score_Rect.centerx = 711
     score_Rect.y = 100
     SCREEN.blit(scoreText, score_Rect)
 
     # Score message
     scoreM_Rect = scoreMessage.get_rect()
-    scoreM_Rect.centerx = 300
+    scoreM_Rect.centerx = 711
     scoreM_Rect.y = 200
     SCREEN.blit(scoreMessage, scoreM_Rect)
 
     # Combo Message
-    comboMessage = messageFont.render("Combo: "+str(combo), True, (0,0,0))
+    comboMessage = messageFont.render("Combo: "+str(combo), True, d.black)
     combo_rect = comboMessage.get_rect()
-    combo_rect.centerx = 300
+    combo_rect.centerx = 711
     combo_rect.y = 250
     if combo > 1:
         comboMessage.set_alpha(255)
