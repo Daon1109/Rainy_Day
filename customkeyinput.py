@@ -1,6 +1,7 @@
 
 ############################################
 import pygame
+import design as d
 ############################################
 
 
@@ -10,18 +11,12 @@ def keyinput(SCREEN, clock):
     pygame.display.set_caption("Custom Key Input Window")
 
     # fonts
-    c_font = pygame.font.SysFont("arial", 45, True, False)
-    sb_font = pygame.font.SysFont("arial", 40, True, False)
+    c_font = d.arial(45)
+    sb_font = d.arial(40)
     # color
-    white = (255,255,255)
-    black = (0,0,0)
-    blue = (21,129,230)
-    red = (227,46,14)
-    darkgreen = (8,102,43)
-    lightgreen = (8,207,82)
     color = [0,0,0,0,0]
-    rectcolor = darkgreen
-    enterkeycolor = white
+    rectcolor = d.darkgreen
+    enterkeycolor = d.white
 
 
 
@@ -33,7 +28,7 @@ def keyinput(SCREEN, clock):
         customkey[c] = str(c+1)
         keydisplayed[c] = c_font.render(customkey[c], True, (0,0,0))
         kd_rect[c] = keydisplayed[c].get_rect()
-        kd_rect[c].centerx = 75 + (150 * c)
+        kd_rect[c].centerx = 411+ 75 + (150 * c)
         kd_rect[c].centery = 625
 
 
@@ -47,12 +42,12 @@ def keyinput(SCREEN, clock):
         # Setting KeyboxMessage
         keyboxMessage[c] = c_font.render(("Key#"+str(c+1)+": "), True, (0,0,0))
         message_rect[c] = keyboxMessage[c].get_rect()
-        message_rect[c].x = 0
+        message_rect[c].x = 416
         message_rect[c].centery = 90 + (90*c)
         # Setting keyinput(default)
         keyinput[c] = c_font.render(customkey[c], True, (0,0,0))
         input_rect[c] = keyinput[c].get_rect()
-        input_rect[c].x = 150
+        input_rect[c].x = 411+150
         input_rect[c].centery = 90 + (90*c)
 
 
@@ -67,7 +62,7 @@ def keyinput(SCREEN, clock):
     while c_playing:
 
         # background color: white
-        SCREEN.fill((255,255,255))
+        SCREEN.fill(d.white)
 
 
 
@@ -94,7 +89,7 @@ def keyinput(SCREEN, clock):
                         eventbox = 4
 
                 # Enter Key Process
-                if pygame.Rect(50, 450, 500, 60).collidepoint(event.pos):
+                if pygame.Rect(461, 450, 500, 60).collidepoint(event.pos):
                     e_keyoverlap = 0      # identify whether key overlapped or not
                     e_noinput = 0         # identify if customkey has no value
                     for prvnt1 in range(4):
@@ -134,7 +129,7 @@ def keyinput(SCREEN, clock):
 
                             # special keys
                             if customkey[eventbox] == " ":
-                                customkey[eventbox] = "SPACE"
+                                customkey[eventbox] = ''
                             elif customkey[eventbox] == chr(9):
                                 customkey[eventbox] = "TAB"
                             elif customkey[eventbox] == chr(27):
@@ -148,28 +143,30 @@ def keyinput(SCREEN, clock):
 
 
         # UI 1234
-        pygame.draw.line(SCREEN, (0,0,0), [150,600], [150,650], 3)
-        pygame.draw.line(SCREEN, (0,0,0), [300,600], [300,650], 3)
-        pygame.draw.line(SCREEN, (0,0,0), [450,600], [450,650], 3)
-        pygame.draw.line(SCREEN, (0,0,0), [0,600], [600,600], 3)
-        pygame.draw.line(SCREEN, (0,0,0), [0,650], [600,650], 3)
+        pygame.draw.line(SCREEN, (0,0,0), [411+150,600], [411+150,650], 3)
+        pygame.draw.line(SCREEN, (0,0,0), [411+300,600], [411+300,650], 3)
+        pygame.draw.line(SCREEN, (0,0,0), [411+450,600], [411+450,650], 3)
+        pygame.draw.line(SCREEN, (0,0,0), [411,600], [1011,600], width=3)
+        pygame.draw.line(SCREEN, (0,0,0), [411,650], [1011,650], width=3)
+        pygame.draw.line(SCREEN, (0,0,0), [410,0], [410,800], width=3)
+        pygame.draw.line(SCREEN, (0,0,0), [1012,0], [1012,800], width=3)
 
         for i in range(4):
 
             # Color Setting
-            color[i] = black
-            color[eventbox] = blue
+            color[i] = d.black
+            color[eventbox] = d.blue
 
             # UI 1234
             if len(customkey[i]) == 5:
                 keydisplayed[i] = sb_font.render(customkey[i], True, color[i])
-                kd_rect[i].centerx = 35 + (150 * i)
+                kd_rect[i].centerx = 411 + 35 + (150 * i)
             elif len(customkey[i]) == 3:
                 keydisplayed[i] = c_font.render(customkey[i], True, color[i])
-                kd_rect[i].centerx = 50 + (150 * i)
+                kd_rect[i].centerx = 411 + 50 + (150 * i)
             else:
                 keydisplayed[i] = c_font.render(customkey[i], True, color[i])
-                kd_rect[i].centerx = 75 + (150 * i)
+                kd_rect[i].centerx = 411 + 75 + (150 * i)
             SCREEN.blit(keydisplayed[i], kd_rect[i])
 
             # UI keyinputbox
@@ -181,15 +178,15 @@ def keyinput(SCREEN, clock):
         # Rect: Enter button
         # Change button's color by mouse's position
         mousepos = pygame.mouse.get_pos()
-        if mousepos[0]>50 and mousepos[0]<550 and mousepos[1]>450 and mousepos[1]<510:
-            rectcolor = lightgreen
+        if mousepos[0]>461 and mousepos[0]<911 and mousepos[1]>450 and mousepos[1]<510:
+            rectcolor = d.lightgreen
         else:
-            rectcolor = darkgreen
+            rectcolor = d.darkgreen
         # Drawing
-        pygame.draw.rect(SCREEN, rectcolor, pygame.Rect(50, 450, 500, 60), border_radius=6)
+        pygame.draw.rect(SCREEN, rectcolor, pygame.Rect(461, 450, 500, 60), border_radius=6)
         enterkey = c_font.render("GO", True, enterkeycolor)
         enter_rect = enterkey.get_rect()
-        enter_rect.centerx = 300
+        enter_rect.centerx = 711
         enter_rect.centery = 480
         SCREEN.blit(enterkey, enter_rect)
 
@@ -199,22 +196,22 @@ def keyinput(SCREEN, clock):
             e_noinput = 0
         # errormessage setting
         if e_noinput == 1:
-            errorMessage = c_font.render("ERROR: No Input", True, white)
+            errorMessage = c_font.render("ERROR: No Input", True, d.white)
         elif e_keyoverlap == 1:
-            errorMessage = c_font.render("ERROR: Key Overlapped", True, white)
+            errorMessage = c_font.render("ERROR: Key Overlapped", True, d.white)
         else:   # Debugging
-            errorMessage = c_font.render("NONE", True, white)
+            errorMessage = c_font.render("NONE", True, d.white)
         em_rect = errorMessage.get_rect()
-        em_rect.centerx = 300
+        em_rect.centerx = 711
         em_rect.centery = 250
         # making errormessage transparent
         if (e_keyoverlap + e_noinput) == 0:
             em_rect_pos = pygame.Rect(0,0,0,0)
             errorMessage.set_alpha(0)
         else:
-            em_rect_pos = pygame.Rect(50, 200, 500, 100)
+            em_rect_pos = pygame.Rect(461, 200, 500, 100)
             errorMessage.set_alpha(255)
-        pygame.draw.rect(SCREEN, red, em_rect_pos, border_radius=6)
+        pygame.draw.rect(SCREEN, d.red, em_rect_pos, border_radius=6)
         SCREEN.blit(errorMessage, em_rect)
 
 
