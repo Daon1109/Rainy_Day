@@ -12,15 +12,15 @@ import customkeyinput
 # Restart pygame(init)
 pygame.init()
 
- 
-# Save SCREEN object
-SCREEN = pygame.display.set_mode((1422,800))
+
 ##############################################################
 # Bug: icon loading failed
-icon = pygame.image.load("C:/Coding/Python/Rainy_Day/icon.png")
+icon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/icon.png")
 pygame.display.set_icon(icon)
 ##############################################################
 
+# Save SCREEN object
+SCREEN = pygame.display.set_mode((1422,800))
 
 # Create Clock for fps
 clock = pygame.time.Clock()
@@ -77,16 +77,21 @@ block_Rect = [0,0,0,0,0]
 i=0
 while i<4:
     # Loading image(block)
-    block[i] = pygame.image.load("C:/Coding/Python/Rainy_Day/block.png")
+    block[i] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/block.png")
     block[i] = pygame.transform.scale(block[i], (150, 30))
 
-    # Save block's Rect data
+    # Saving Rect data
     block_Rect[i] = block[i].get_rect()
     block_Rect[i].x = 411+ 150*i
     block_Rect[i].y = 100
-
     i+=1
 
+# Loading image(pause icon)
+pauseicon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/pause.png")
+pauseicon = pygame.transform.scale(pauseicon, (80, 80))
+pause_rect = pauseicon.get_rect()
+pause_rect.centerx = 1360
+pause_rect.centery = 48.5
 
 
 
@@ -97,7 +102,9 @@ score = 0
 boost = 0
 scoreText = scoreFont.render(str(score), True, d.black)
 
-
+# Boost/Skill activation
+booston = 0
+hitblock = [0,0,0,0]
 
 # Playing Code
 playing = True
@@ -119,96 +126,110 @@ while playing:
             pygame.quit()
 
 
-
-
+        # Event: Pause Playing
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if pause_rect.collidepoint(event.pos):
+                # pop-up screen
+                home.popupScreen(clock)
 
         
         # Applying Customized Keys
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             
-            if event.key in customkey:
-                for k in range(4):
-                    if event.key == customkey[k]:
-                        if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
-                            # making image transparent
-                            block[k].set_alpha(0)
+            if booston == 0:
+                if event.key in customkey:
+                    for k in range(4):
+                        if event.key == customkey[k]:
+                            if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
+                                # making image transparent
+                                block[k].set_alpha(0)
 
-                            # combo system #1
-                            combo_identifier[k] = 1
-                            combo +=1
+                                # combo system #1
+                                combo_identifier[k] = 1
+                                combo +=1
 
-                            # cast_t counting
-                            # print("cast_t: "+str(cast_t))
-                            if cast_t > 18:      # range: 0.4 sec (I didnt check it)
-                                cnt = 1
-                                cast_t = 0
+                                # cast_t counting
+                                # print("cast_t: "+str(cast_t))
+                                if cast_t > 18:      # range: 0.4 sec (I didnt check it)
+                                    cnt = 1
+                                    cast_t = 0
+                                else:
+                                    cnt += 1
+
+                            # MISS: range out
                             else:
-                                cnt += 1
+                                cnt = 0
+                                # combo system #2
+                                print("combo reset")
+                                combo = 0
+                                combo_identifier = [0,0,0,0,0]
+                        
+                elif event.key == key.space:
+                    ##########################################################################################
+                    if boost<1000:  # Wrong Key
+                        cnt = 0     # combo system #2
+                        print("combo reset")
+                        combo = 0
+                        combo_identifier = [0,0,0,0,0]
+                    else:
+                        # boost: 15s
+                        boost_t = 0
+                        booston = 1
+                        # boost reset
+                        combo = 0
+                        combo_identifier = [0,0,0,0,0]
 
-                        # MISS: range out
-                        else:
-                            cnt = 0
-                            # combo system #2
-                            print("combo reset")
-                            combo = 0
-                            combo_identifier = [0,0,0,0,0]
-                    
-            elif event.key == key.space:
-                ##########################################################################################
-                if boost<1000:  # Wrong Key
-                    cnt = 0     # combo system #2
+
+                # MISS: wrong key
+                else:
+                    cnt = 0
+                    # combo system #2
                     print("combo reset")
                     combo = 0
                     combo_identifier = [0,0,0,0,0]
-                else:
-                    # boost reset
-                    boost = 0
-                    combo = 0
-                    combo_identifier = [0,0,0,0,0]
 
 
-            # MISS: wrong key
+                # printing: terminal + scoring + setting score message
+                if cnt == 0:
+                    print("MISS")
+                    scoreMessage =  messageFont.render("MISS -5", True, (232, 5, 65))
+                    score-=5
+                elif cnt == 1:
+                    print("1 block")
+                    scoreMessage =  messageFont.render("1 block +10", True, (91, 196, 4))
+                    score+=10
+                    if boost<1000: boost+=10
+                elif cnt == 2:
+                    print("2 blocks")
+                    scoreMessage =  messageFont.render("2 blocks +25", True, (4, 209, 206))
+                    score+=15
+                    if boost<1000: boost+=15
+                elif cnt == 3:
+                    print("3 blocks")
+                    scoreMessage =  messageFont.render("3 blocks +40", True, (158, 4, 209))
+                    score+=15
+                    if boost<1000: boost+=15
+                elif cnt == 4:
+                    print("4 blocks")
+                    scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
+                    score+=60
+                    if boost<1000: boost+=60
+
+                print("combo: "+str(combo)+"\n")
+                if boost<1000:
+                    if combo>1:
+                        boost = boost + (combo*2-5)
+            
+            # Boost activated
             else:
-                cnt = 0
-                # combo system #2
-                print("combo reset")
-                combo = 0
-                combo_identifier = [0,0,0,0,0]
-
-
-            # printing: terminal + scoring + setting score message
-            if cnt == 0:
-                print("MISS")
-                scoreMessage =  messageFont.render("MISS -5", True, (232, 5, 65))
-                score-=5
-            elif cnt == 1:
-                print("1 block")
-                scoreMessage =  messageFont.render("1 block +10", True, (91, 196, 4))
-                score+=10
-                if boost<1000: boost+=10
-            elif cnt == 2:
-                print("2 blocks")
-                scoreMessage =  messageFont.render("2 blocks +25", True, (4, 209, 206))
-                score+=15
-                if boost<1000: boost+=15
-            elif cnt == 3:
-                print("3 blocks")
-                scoreMessage =  messageFont.render("3 blocks +40", True, (158, 4, 209))
-                score+=15
-                if boost<1000: boost+=15
-            elif cnt == 4:
-                print("4 blocks")
-                scoreMessage =  messageFont.render("4 blocks +100", True, (252, 190, 18))
-                score+=60
-                if boost<1000: boost+=60
-
-            print("combo: "+str(combo)+"\n")
-            if boost<1000:
-                if combo>1:
-                    boost = boost + (combo*2-5)
-
-
-
+                for i in range(4):
+                    if hitblock[i] == 0:
+                        block[i].set_alpha(0)
+                        hitblock[i] = 1
+                        print("Boost!")
+                        scoreMessage =  messageFont.render("Boost +15", True, d.orangeyellow)
+                        score+=15
+                        break
 
 
 
@@ -225,32 +246,53 @@ while playing:
     pygame.draw.line(SCREEN, (0,0,0), [1012,0], [1012,800], width=3)
 
 
+    # Pause/Replay Button
+    '''     # changing scale
+    mousepos = pygame.mouse.get_pos()
+    if mousepos[0]>1320 and mousepos[0]<1400 and mousepos[1]>22 and mousepos[1]<97:
+        pauseicon = pygame.transform.scale(pauseicon, (100, 93.75))
+        pause_rect.centerx = 1360
+        pause_rect.centery = 48.5
+    else:
+        pauseicon = pygame.transform.scale(pauseicon, (80, 75))
+        pause_rect.centerx = 1360
+    pause_rect.centery = 48.5
+    '''
+    SCREEN.blit(pauseicon, pause_rect)
+  
 
-    # Boost
+    # Boost UI
     boost_length = boost/2
-    boost_yco = 600 - boost_length
+    boost_yco = 630 - boost_length
+    boostrate = messageFont.render(str(boost/10)+"%", True, d.white)     # Boost Rate
     if boost_length < 500:
         booststr = "Boost"
         boost_color = d.darkblue
         boost_r_color = d.white
     else:
         boost = 1000
-        booststr = "Spacebar!"
+        if booston == 1:        # Boost activated
+            booststr = "Boost ON"
+            boost_yco = 130 + (5/9)*boost_t
+            boost_length = 500 - (5/9)*boost_t
+            boostrate = messageFont.render(str(15-int(boost_t/60)), True, d.white)
+        else:
+            booststr = "Spacebar!"
         boost_color = d.orangeyellow
         boost_r_color = d.white
 
-    pygame.draw.rect(SCREEN, d.darkblue, pygame.Rect(1146,100,150,500), border_radius=3)
+
+    pygame.draw.rect(SCREEN, d.darkblue, pygame.Rect(1146,130,150,500), border_radius=3)
     pygame.draw.rect(SCREEN, d.orangeyellow, pygame.Rect(1146,boost_yco,150,boost_length), border_radius=3)
-    pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,620,200,50), border_radius=5)
+    pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,650,200,50), border_radius=5)
     boostText = messageFont.render(booststr, True, boost_r_color)     # "Boost"
     boost_Rect = boostText.get_rect()
     boost_Rect.centerx = 1221
-    boost_Rect.y = 620
+    boost_Rect.y = 650
     SCREEN.blit(boostText, boost_Rect)
-    boostrate = messageFont.render(str(boost/10)+"%", True, d.white)     # Boost Rate
-    boostrate_Rect = boostrate.get_rect()
+    boostrate_Rect = boostrate.get_rect()   # Boost Rate
     boostrate_Rect.centerx = 1221
-    boostrate_Rect.y = 150
+    boostrate_Rect.y = 180
     SCREEN.blit(boostrate, boostrate_Rect)
 
 
@@ -299,6 +341,9 @@ while playing:
             block_Rect[j].bottom = 0
             # making image appear
             block[j].set_alpha(255)
+            # Boost (hitblock)
+            if booston == 1:
+                hitblock[j] = 0
 
 
         # combo system #3
@@ -322,5 +367,11 @@ while playing:
     # fps = 60
     clock.tick(60)
 
-    # counting cast_t
+    # timer
     cast_t += 1
+    if booston == 1:
+        boost_t +=1
+        # Boost deactivation
+        if boost_t > 900:
+            boost = 0
+            booston = 0
