@@ -15,7 +15,7 @@ pygame.init()
 
 ##############################################################
 # Bug: icon loading failed
-icon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/icon.png")
+icon = pygame.image.load("C:/Users/user/pygame_project/icon.png")
 pygame.display.set_icon(icon)
 ##############################################################
 
@@ -74,10 +74,11 @@ pygame.display.set_caption("Rainy Day")
 # Loading image(block) and changing image's size
 block = [0,0,0,0,0]
 block_Rect = [0,0,0,0,0]
+blockspeed = [3,5,7,10]
 i=0
 while i<4:
     # Loading image(block)
-    block[i] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/block.png")
+    block[i] = pygame.image.load("C:/Users/user/pygame_project/block.png")
     block[i] = pygame.transform.scale(block[i], (150, 30))
 
     # Saving Rect data
@@ -85,14 +86,6 @@ while i<4:
     block_Rect[i].x = 411+ 150*i
     block_Rect[i].y = 100
     i+=1
-
-# Loading image(pause icon)
-pauseicon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/pause.png")
-pauseicon = pygame.transform.scale(pauseicon, (80, 80))
-pause_rect = pauseicon.get_rect()
-pause_rect.centerx = 1360
-pause_rect.centery = 48.5
-
 
 
 
@@ -112,6 +105,9 @@ cnt = 0         # blocks per keydown(score) counter
 cast_t = 0      # consider specific range of time as the same moment
 combo = 0       # 'combo' score
 combo_identifier = [0,0,0,0,0]
+pause_status = d.gray
+start_status = d.lightgreen
+pausecontrol = 0
 
 while playing:
 
@@ -129,8 +125,26 @@ while playing:
         # Event: Pause Playing
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if pause_rect.collidepoint(event.pos):
-                # pop-up screen
-                home.popupScreen(clock)
+                pausecontrol = 1
+                pause_status = d.red
+                start_status = d.gray
+                blockspeed = [0,0,0,0]
+                # preventing score cheat
+                tempscore = 0
+                tempscore = score
+            elif start_rect.collidepoint(event.pos):
+                pausecontrol = 0
+                pause_status = d.gray
+                start_status = d.lightgreen
+                blockspeed = [3,5,7,10]
+                # preventing score cheat
+                if (score-tempscore)>0:
+                    scoreMessage =  messageFont.render("No Cheating!!! -"+str(score-tempscore), True, d.red)
+                    combo = 0
+                score = tempscore
+            else:
+                pass
+
 
         
         # Applying Customized Keys
@@ -245,20 +259,6 @@ while playing:
     pygame.draw.line(SCREEN, (0,0,0), [410,0], [410,800], width=3)
     pygame.draw.line(SCREEN, (0,0,0), [1012,0], [1012,800], width=3)
 
-
-    # Pause/Replay Button
-    '''     # changing scale
-    mousepos = pygame.mouse.get_pos()
-    if mousepos[0]>1320 and mousepos[0]<1400 and mousepos[1]>22 and mousepos[1]<97:
-        pauseicon = pygame.transform.scale(pauseicon, (100, 93.75))
-        pause_rect.centerx = 1360
-        pause_rect.centery = 48.5
-    else:
-        pauseicon = pygame.transform.scale(pauseicon, (80, 75))
-        pause_rect.centerx = 1360
-    pause_rect.centery = 48.5
-    '''
-    SCREEN.blit(pauseicon, pause_rect)
   
 
     # Boost UI
@@ -281,7 +281,6 @@ while playing:
         boost_color = d.orangeyellow
         boost_r_color = d.white
 
-
     pygame.draw.rect(SCREEN, d.darkblue, pygame.Rect(1146,130,150,500), border_radius=3)
     pygame.draw.rect(SCREEN, d.orangeyellow, pygame.Rect(1146,boost_yco,150,boost_length), border_radius=3)
     pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,650,200,50), border_radius=5)
@@ -294,6 +293,35 @@ while playing:
     boostrate_Rect.centerx = 1221
     boostrate_Rect.y = 180
     SCREEN.blit(boostrate, boostrate_Rect)
+
+
+
+    # Pause/Start UI
+    pauseicon = pygame.image.load("C:/Users/user/pygame_project/pause.png")
+    pauseicon = pygame.transform.scale(pauseicon, (140, 140))
+    pause_rect = pauseicon.get_rect()
+    pause_rect.centerx = 205
+    pause_rect.centery = 250
+    pygame.draw.circle(SCREEN, pause_status, (330,250), 20)
+    starticon = pygame.image.load("C:/Users/user/pygame_project/start.png")
+    starticon = pygame.transform.scale(starticon, (140, 140))
+    start_rect = starticon.get_rect()
+    start_rect.centerx = 205
+    start_rect.centery = 500
+    pygame.draw.circle(SCREEN, start_status, (330,500), 20)
+    SCREEN.blit(pauseicon, pause_rect)
+    SCREEN.blit(starticon, start_rect)
+
+    '''# changing status color
+    mousepos = pygame.mouse.get_pos()
+    if mousepos[0]>1320 and mousepos[0]<1400 and mousepos[1]>22 and mousepos[1]<97:
+        pause_status_c = d.red
+    else:
+        pauseicon = pygame.transform.scale(pauseicon, (80, 75))
+        pause_rect.centerx = 1360
+    pause_rect.centery = 48.5'''
+
+
 
 
     # Scoreboard
@@ -323,10 +351,8 @@ while playing:
 
     ##############################
     # 좌표증가 코드
-    block_Rect[0].y +=3
-    block_Rect[1].y +=5
-    block_Rect[2].y +=7
-    block_Rect[3].y +=10
+    for s in range(4):
+        block_Rect[s].y +=blockspeed[s]
     ##############################
 
 
