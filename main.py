@@ -130,8 +130,8 @@ while playing:
                 start_status = d.gray
                 blockspeed = [0,0,0,0]
                 # preventing score cheat
-                tempscore = 0
                 tempscore = score
+                tempboost = boost
             elif start_rect.collidepoint(event.pos):
                 pausecontrol = 0
                 pause_status = d.gray
@@ -142,6 +142,7 @@ while playing:
                     scoreMessage =  messageFont.render("No Cheating!!! -"+str(score-tempscore), True, d.red)
                     combo = 0
                 score = tempscore
+                boost = tempboost
             else:
                 pass
 
@@ -312,16 +313,19 @@ while playing:
     SCREEN.blit(pauseicon, pause_rect)
     SCREEN.blit(starticon, start_rect)
 
-    '''# changing status color
+    # changing status color
     mousepos = pygame.mouse.get_pos()
-    if mousepos[0]>1320 and mousepos[0]<1400 and mousepos[1]>22 and mousepos[1]<97:
-        pause_status_c = d.red
+    if pausecontrol == 1:
+        if mousepos[0]>135 and mousepos[0]<275 and mousepos[1]>430 and mousepos[1]<570:
+            start_status = d.lightgreen
+        else:
+            start_status = d.gray
     else:
-        pauseicon = pygame.transform.scale(pauseicon, (80, 75))
-        pause_rect.centerx = 1360
-    pause_rect.centery = 48.5'''
-
-
+        if mousepos[0]>135 and mousepos[0]<275 and mousepos[1]>180 and mousepos[1]<320:
+            pause_status = d.red
+        else:
+            pause_status = d.gray
+        
 
 
     # Scoreboard
