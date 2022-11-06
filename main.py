@@ -7,6 +7,19 @@ import key
 import design as d
 import home
 import customkeyinput
+#import vlc
+####print("runnin")
+####from playsound import playsound
+
+####print("runnin2")
+
+## mp3 player
+####playsound("C:/Coding/Python/Rainy_Day/etc/Robinson.mp3",block=False)
+####print("runnin3")
+#sample_Robinson = vlc.MediaPlayer("C:/Coding/Python/Rainy_Day/etc/Robinson.mp3")
+#sample_Robinson.play()
+#sample_Robinson.stop()
+
 
 
 # Restart pygame(init)
@@ -15,7 +28,7 @@ pygame.init()
 
 ##############################################################
 # Bug: icon loading failed
-icon = pygame.image.load("C:/Users/user/pygame_project/icon.png")
+icon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/icon.png")
 pygame.display.set_icon(icon)
 ##############################################################
 
@@ -48,14 +61,14 @@ keydisplayed = [0,0,0,0,0]
 kd_rect = [0,0,0,0,0]
 for c in range(4):
     # UI 1234 (Copied)
-    keydisplayed[c] = messageFont.render(customkey[c], True, d.black)
+    keydisplayed[c] = messageFont.render(customkey[c], True, d.white)
     kd_rect[c] = keydisplayed[c].get_rect()
     kd_rect[c].centery = 625
     if len(customkey[c]) == 5:
-        keydisplayed[c] = sb_font.render(customkey[c], True, d.black)
+        keydisplayed[c] = sb_font.render(customkey[c], True, d.white)
         kd_rect[c].centerx = 491 + (150 * c)    # idk why
     else:
-        keydisplayed[c] = messageFont.render(customkey[c], True, d.black)
+        keydisplayed[c] = messageFont.render(customkey[c], True, d.white)
         kd_rect[c].centerx = 486 + (150 * c)
 
     # string replaced with pygame.key (*reusing variable)
@@ -71,22 +84,32 @@ for c in range(4):
 pygame.display.set_caption("Rainy Day")
 
 
-# Loading image(block) and changing image's size
-block = [0,0,0,0,0]
+# Loading image and changing image's size
+block = [[0,0],[0,0],[0,0],[0,0],[0,0]]
 block_Rect = [0,0,0,0,0]
 blockspeed = [3,5,7,10]
 i=0
+j=0
 while i<4:
     # Loading image(block)
-    block[i] = pygame.image.load("C:/Users/user/pygame_project/block.png")
-    block[i] = pygame.transform.scale(block[i], (150, 30))
-
+    block[i][0] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/block.png")
+    block[i][1] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/boostblock.png")
+    block[i][0] = pygame.transform.scale(block[i][0], (150, 30))
+    block[i][1] = pygame.transform.scale(block[i][1], (150, 30))
+    block[i][0].set_alpha(255)
+    block[i][1].set_alpha(0)
     # Saving Rect data
-    block_Rect[i] = block[i].get_rect()
+    block_Rect[i] = block[i][0].get_rect()
     block_Rect[i].x = 411+ 150*i
     block_Rect[i].y = 100
     i+=1
-
+playrange = pygame.image.load("C:/Coding/Python/Rainy_Day/images/playrange.png")
+playrange = pygame.transform.scale(playrange, (622, 800))
+boostbox = [0,0]
+boostbox[0] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/boost_charging.png")
+boostbox[0] = pygame.transform.scale(boostbox[0], (170, 520))
+boostbox[1] = pygame.image.load("C:/Coding/Python/Rainy_Day/images/boost_full.png")
+boostbox[1] = pygame.transform.scale(boostbox[1], (170, 520))
 
 
 # Debugging: score message
@@ -130,6 +153,8 @@ while playing:
                 start_status = d.gray
                 blockspeed = [0,0,0,0]
                 # preventing score cheat
+                tempscore = 0
+                tempboost = 0
                 tempscore = score
                 tempboost = boost
             elif start_rect.collidepoint(event.pos):
@@ -157,7 +182,7 @@ while playing:
                         if event.key == customkey[k]:
                             if block_Rect[k].y <= 660 and block_Rect[k].y >= 590:
                                 # making image transparent
-                                block[k].set_alpha(0)
+                                block[k][booston].set_alpha(0)
 
                                 # combo system #1
                                 combo_identifier[k] = 1
@@ -175,22 +200,25 @@ while playing:
                             else:
                                 cnt = 0
                                 # combo system #2
-                                print("combo reset")
                                 combo = 0
                                 combo_identifier = [0,0,0,0,0]
                         
+                # Boost Activation
                 elif event.key == key.space:
-                    ##########################################################################################
+
                     if boost<1000:  # Wrong Key
                         cnt = 0     # combo system #2
-                        print("combo reset")
                         combo = 0
                         combo_identifier = [0,0,0,0,0]
                     else:
                         # boost: 15s
                         boost_t = 0
                         booston = 1
-                        # boost reset
+                        # visual effect
+                        for i in range(4):
+                            block[i][0].set_alpha(0)
+                            block[i][1].set_alpha(255)
+                        # combo reset
                         combo = 0
                         combo_identifier = [0,0,0,0,0]
 
@@ -199,7 +227,6 @@ while playing:
                 else:
                     cnt = 0
                     # combo system #2
-                    print("combo reset")
                     combo = 0
                     combo_identifier = [0,0,0,0,0]
 
@@ -239,7 +266,8 @@ while playing:
             else:
                 for i in range(4):
                     if hitblock[i] == 0:
-                        block[i].set_alpha(0)
+                        block[i][0].set_alpha(0)
+                        block[i][1].set_alpha(0)
                         hitblock[i] = 1
                         print("Boost!")
                         scoreMessage =  messageFont.render("Boost +15", True, d.orangeyellow)
@@ -251,14 +279,13 @@ while playing:
 
     # Background Settings
     # Warning: background color setting code can erase previous display settings
-    SCREEN.fill((255,255,255))
-    pygame.draw.line(SCREEN, (0,0,0), [411+150,600], [411+150,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [411+300,600], [411+300,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [411+450,600], [411+450,650], 3)
-    pygame.draw.line(SCREEN, (0,0,0), [411,600], [1011,600], width=3)
-    pygame.draw.line(SCREEN, (0,0,0), [411,650], [1011,650], width=3)
-    pygame.draw.line(SCREEN, (0,0,0), [410,0], [410,800], width=3)
-    pygame.draw.line(SCREEN, (0,0,0), [1012,0], [1012,800], width=3)
+    SCREEN.fill(d.bluegray)
+    pygame.draw.line(SCREEN, d.whiteblue, [411+150,600], [411+150,650], 3)
+    pygame.draw.line(SCREEN, d.whiteblue, [411+300,600], [411+300,650], 3)
+    pygame.draw.line(SCREEN, d.whiteblue, [411+450,600], [411+450,650], 3)
+    pygame.draw.line(SCREEN, d.whiteblue, [411,600], [1011,600], width=3)
+    pygame.draw.line(SCREEN, d.whiteblue, [411,650], [1011,650], width=3)
+    SCREEN.blit(playrange,(400,0))
 
   
 
@@ -270,6 +297,7 @@ while playing:
         booststr = "Boost"
         boost_color = d.darkblue
         boost_r_color = d.white
+        SCREEN.blit(boostbox[0], (1136,120))
     else:
         boost = 1000
         if booston == 1:        # Boost activated
@@ -277,14 +305,15 @@ while playing:
             boost_yco = 130 + (5/9)*boost_t
             boost_length = 500 - (5/9)*boost_t
             boostrate = messageFont.render(str(15-int(boost_t/60)), True, d.white)
+            SCREEN.blit(boostbox[1], (1136,120))
         else:
             booststr = "Spacebar!"
+            SCREEN.blit(boostbox[1], (1136,120))
         boost_color = d.orangeyellow
         boost_r_color = d.white
 
-    pygame.draw.rect(SCREEN, d.darkblue, pygame.Rect(1146,130,150,500), border_radius=3)
     pygame.draw.rect(SCREEN, d.orangeyellow, pygame.Rect(1146,boost_yco,150,boost_length), border_radius=3)
-    pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,650,200,50), border_radius=5)
+    pygame.draw.rect(SCREEN, boost_color, pygame.Rect(1121,650,200,60), border_radius=5)
     boostText = messageFont.render(booststr, True, boost_r_color)     # "Boost"
     boost_Rect = boostText.get_rect()
     boost_Rect.centerx = 1221
@@ -298,13 +327,13 @@ while playing:
 
 
     # Pause/Start UI
-    pauseicon = pygame.image.load("C:/Users/user/pygame_project/pause.png")
+    pauseicon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/pause.png")
     pauseicon = pygame.transform.scale(pauseicon, (140, 140))
     pause_rect = pauseicon.get_rect()
     pause_rect.centerx = 205
     pause_rect.centery = 250
     pygame.draw.circle(SCREEN, pause_status, (330,250), 20)
-    starticon = pygame.image.load("C:/Users/user/pygame_project/start.png")
+    starticon = pygame.image.load("C:/Coding/Python/Rainy_Day/images/start.png")
     starticon = pygame.transform.scale(starticon, (140, 140))
     start_rect = starticon.get_rect()
     start_rect.centerx = 205
@@ -315,21 +344,21 @@ while playing:
 
     # changing status color
     mousepos = pygame.mouse.get_pos()
-    if pausecontrol == 1:
-        if mousepos[0]>135 and mousepos[0]<275 and mousepos[1]>430 and mousepos[1]<570:
-            start_status = d.lightgreen
-        else:
-            start_status = d.gray
-    else:
+    if pausecontrol==0:
         if mousepos[0]>135 and mousepos[0]<275 and mousepos[1]>180 and mousepos[1]<320:
             pause_status = d.red
         else:
             pause_status = d.gray
-        
+    else:
+        if mousepos[0]>135 and mousepos[0]<275 and mousepos[1]>430 and mousepos[1]<570:
+            start_status = d.lightgreen
+        else:
+            start_status = d.gray
+
 
 
     # Scoreboard
-    scoreText = scoreFont.render(str(score), True, d.black)
+    scoreText = scoreFont.render(str(score), True, d.whiteblue)
     score_Rect = scoreText.get_rect()
     score_Rect.centerx = 711
     score_Rect.y = 100
@@ -342,7 +371,7 @@ while playing:
     SCREEN.blit(scoreMessage, scoreM_Rect)
 
     # Combo Message
-    comboMessage = messageFont.render("Combo: "+str(combo), True, d.black)
+    comboMessage = messageFont.render("Combo: "+str(combo), True, d.whiteblue)
     combo_rect = comboMessage.get_rect()
     combo_rect.centerx = 711
     combo_rect.y = 250
@@ -360,8 +389,6 @@ while playing:
     ##############################
 
 
-
-
     j=0
     while j<4:
         # Preventing block escaping screen
@@ -370,7 +397,7 @@ while playing:
             # y coordinate of block(reset)
             block_Rect[j].bottom = 0
             # making image appear
-            block[j].set_alpha(255)
+            block[j][booston].set_alpha(255)
             # Boost (hitblock)
             if booston == 1:
                 hitblock[j] = 0
@@ -379,13 +406,12 @@ while playing:
         # combo system #3
         if block_Rect[j].y >660:
             if combo_identifier[j] == 0:
-                print("combo reset")
                 combo = -1
                 combo_identifier = [0,0,0,0,0]
 
 
         # Copy block in surface (coordinate: block_Rect)
-        SCREEN.blit(block[j], block_Rect[j])
+        SCREEN.blit(block[j][booston], block_Rect[j])
         # UI 1234 blit
         SCREEN.blit(keydisplayed[j], kd_rect[j])
         j+=1
@@ -405,3 +431,6 @@ while playing:
         if boost_t > 900:
             boost = 0
             booston = 0
+            # visual effect
+            for i in range(4):
+                block[i][1].set_alpha(0)
