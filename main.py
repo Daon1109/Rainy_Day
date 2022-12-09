@@ -7,19 +7,7 @@ import key
 import design as d
 import home
 import customkeyinput
-#import vlc
-####print("runnin")
-####from playsound import playsound
-
-####print("runnin2")
-
-## mp3 player
-####playsound("C:/Coding/Python/Rainy_Day/etc/Robinson.mp3",block=False)
-####print("runnin3")
-#sample_Robinson = vlc.MediaPlayer("C:/Coding/Python/Rainy_Day/etc/Robinson.mp3")
-#sample_Robinson.play()
-#sample_Robinson.stop()
-
+import random
 
 
 # Restart pygame(init)
@@ -45,12 +33,9 @@ sb_font = d.arial(40)
 
 
 #############################################################################################
-# START & level choosing (game home)
+
+# START(game home)
 home.start_display(SCREEN, clock)
-#home.levelchoose(SCREEN, clock)
-#############################################################################################
-
-
 
 #############################################################################################
 # Custom key input
@@ -116,6 +101,7 @@ boostbox[1] = pygame.transform.scale(boostbox[1], (170, 520))
 scoreMessage =  messageFont.render("", True, d.white)
 score = 0
 boost = 0
+boostcnt = 0
 scoreText = scoreFont.render(str(score), True, d.black)
 
 # Boost/Skill activation
@@ -128,6 +114,7 @@ cnt = 0         # blocks per keydown(score) counter
 cast_t = 0      # consider specific range of time as the same moment
 combo = 0       # 'combo' score
 combo_identifier = [0,0,0,0,0]
+combomax = 0
 pause_status = d.gray
 start_status = d.lightgreen
 pausecontrol = 0
@@ -142,6 +129,10 @@ while playing:
         if event.type == pygame.QUIT:
             playing = False
             print("\n\nScore: "+str(score)+"\n")
+
+            # gameover display
+            home.gameover_display(SCREEN, clock, score, boostcnt, combomax)
+            
             pygame.quit()
 
 
@@ -187,9 +178,10 @@ while playing:
                                 # combo system #1
                                 combo_identifier[k] = 1
                                 combo +=1
+                                if combo > combomax:
+                                    combomax = combo
 
                                 # cast_t counting
-                                # print("cast_t: "+str(cast_t))
                                 if cast_t > 18:      # range: 0.4 sec (I didnt check it)
                                     cnt = 1
                                     cast_t = 0
@@ -214,6 +206,7 @@ while playing:
                         # boost: 15s
                         boost_t = 0
                         booston = 1
+                        boostcnt +=1
                         # visual effect
                         for i in range(4):
                             block[i][0].set_alpha(0)
@@ -396,6 +389,8 @@ while playing:
 
             # y coordinate of block(reset)
             block_Rect[j].bottom = 0
+            # change block speed
+            blockspeed[j] = random.randrange(3,11)
             # making image appear
             block[j][booston].set_alpha(255)
             # Boost (hitblock)
